@@ -1,72 +1,112 @@
-alert('Bienvenidos a Giga Plant - Tu vivero Online')
+let nombre = prompt("Nos gusta la atención personalizada, ¿Cómo es tu nombre?");
 
-const buyProducts = () => {
-    let product = ''
-    let quantity = 0
-    let price = 0
-    let subtotal = 0
-    let continueShopping = true
+alert(`Excelente, ${nombre}. Voy a guiarte para que tengas una compra exitosa.`);
+
+
+const carrito = [];
+
+const ordenarmenormayor = () => {
+    productosgiga.sort((a,b)=> a.precio - b.precio);
+    
+    mostrarlistaordenada();
+}
+
+const ordenarmayormenor = () => {
+    productosgiga.sort((a,b)=> b.precio - a.precio);
+    
+    mostrarlistaordenada();
+}
+
+const mostrarlistaordenada = () => {
+    const listaOrdenada = productosgiga.map(producto => {
+        return '- '+producto.nombre+'$'+producto.precio
+    });
+    alert('Nuestros precios:'+'\n\n'+listaOrdenada.join('\n'))
+    comprarproductos(listaOrdenada)
+}
+
+const comprarproductos = (listaDeProductos) => {
+    let otroproducto;
+    let productonombre = '';
+    let productocantidad = 0;
 
     do {
-        let productValidated = false
-        product = prompt("¿Qué planta queres comprar hoy?: Potus $499; Jazmin $799; Palmera $999; Cactus $599")
+        productonombre = prompt ('¿Qué planta querías?'+'\n\n'+listadeproductos.join('\n'));
+        productocantidad = parseInt(prompt('¿Cuántas plantas querías?'));
 
-        productValidated = validateProduct(product)
+        const producto = productosgiga.find(producto => producto.nombre.toLowerCase() === productoNombre.toLowerCase());
 
-        quantity = parseInt(prompt("¿Cuantas unidades queres?"))
-
-        let quantityValidated = validateQuantity(quantity)
-
-        switch (product) {
-            case 'potus':
-                price = 499
-                break;
-            case 'jazmin':
-                price = 799
-                break;
-            case 'palmera':
-                price = 999
-                break;
-            case 'cactus':
-                price = 599
-                break;
-            default:
-                0;
+        if (producto) {
+            agregarAlCarrito(producto, producto.id, productocantidad)
+        } else {
+            alert('¡Que verguenza! No tenemos esta planta en stock ¡pero no te preocupes! Tomamos nota para la próxima compra.')
         }
 
-        let pricePerProduct = price * quantityValidated
-        subtotal += pricePerProduct
-        console.log (subtotal)
+        otroProducto = confirm('¿Querías alguna otra planta?');
+    } while (otroProducto)
 
-        alert ("Agregaste "+quantityValidated+' plantas a tu vida. Tu total a pagar es $'+subtotal)
+    confirmarcompra()
+};
 
-        continueShopping = confirm('¿Queres otra planta?')
-
-    } while (continueShopping)
-
-    return subtotal
-}
-
-const validateProduct = (product) => {
-    if (product === 'palmera' || product === 'potus' || product === 'jazmin' || product === 'cactus') {
-        return true
+const agregaralcarrito = (producto, productoId, productoCantidad) => {
+    const productorepetido = carrito.find(producto => producto.id === productoId)
+    if (!productorepetido) {
+        producto.cantidad += productoCantidad
+        carrito.push(producto)
     } else {
-        alert('¡Esa planta no está disponible... por lo menos por ahora!')
-        product = prompt("Escribe solamente el nombre de la planta")
+        productorepetido.cantidad += productoCantidad;
     }
-    return product
-}
-    
-
-const validateQuantity = (quantity) => {
-    while (isNaN(quantity) || quantity <= 0){
-        alert('¡Surgió un problema! No ingresaste la cantidad de plantas')
-
-    quantity = parseInt(prompt("Selecciona cuantas plantas necesitas"))
-    }
-    return quantity
 }
 
-let total = buyProducts()
+const eliminarProductoCarrito = (productoNombre) => {
+    carrito.forEach((producto, index) => {
+        if (producto.nombre.toLowerCase() === productoNombre) {
+            if (producto.cantidad > 1) {
+                producto.cantidad--
+            } else {
+                carrito.splice(index, 1);
+            }
+        }
+    });
+    confirmarcompra()
+};
 
-alert('Gracias por comprar en Giga Plant, tu total es $'+total)
+const confirmarcompra = () => {
+    const listaProductos = carrito.map(producto => {
+        return '- '+producto.nombre+' | Total: '+producto.cantidad
+    });
+
+    const confirmar = confirm('Checkout: '
+            +'\n\n'+listaProductos.join('\n')
+            +'\n\n ¿Está bien tu compra?"'
+    )
+
+    if (confirmar) {
+        finalizarCompra(listaProductos)
+    } else {
+        const productoAEliminar = prompt('¿Que planta queres eliminar?')
+        eliminarProductoCarrito(productoAEliminar)
+    }
+};
+
+const finalizarCompra = (listaProductos) => {
+    const cantidadTotal = carrito.reduce((acc, elemento) => acc + elemento.cantidad, 0)
+    const precioTotal = carrito.reduce((acc, elemento) => acc + (elemento.precio * elemento.cantidad), 0)
+    alert('¡Esta es toda tu compra!: '
+        +'\n\n'+listaProductos.join('\n')
+        +'\n\nPlantas: '+cantidadTotal
+        +'\n\nTotal: $'+precioTotal
+        +'\n\nNo hay dudas de que estas nuevas plantas llenarán de vida cada rincon. ¡Que las disfrutes!'
+    )
+};
+
+const comprar = () => {
+    const productosBaratos = confirm("¿Te ordeno las plantas colocando las más caras primeras?")
+    if (productosBaratos){
+        ordenarMenorMayor();
+    }else{
+        ordenarMayorMenor();
+    }
+}
+
+comprar();
